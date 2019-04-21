@@ -29,13 +29,10 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 
 /**
@@ -60,6 +57,7 @@ public class BasicOpMode_Linear_Ray extends LinearOpMode {
     private DcMotor leftDrive = null;
     private DcMotor rightDrive = null;
     private DcMotor rightArm = null;
+    private DcMotor rackPinion = null;
 
     //@Override
     public void runOpMode() {
@@ -72,12 +70,14 @@ public class BasicOpMode_Linear_Ray extends LinearOpMode {
         leftDrive  = hardwareMap.get(DcMotor.class, "motorDriveLeft");
         rightDrive = hardwareMap.get(DcMotor.class, "motorDriveRight");
         rightArm = hardwareMap.get(DcMotor.class, "rightSwingArm");
+        rackPinion = hardwareMap.get(DcMotor.class, "rackAndPinion");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
         leftDrive.setDirection(DcMotor.Direction.REVERSE);
         rightDrive.setDirection(DcMotor.Direction.FORWARD);
         rightArm.setDirection(DcMotor.Direction.FORWARD);
+        rackPinion.setDirection(DcMotor.Direction.FORWARD);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -90,6 +90,7 @@ public class BasicOpMode_Linear_Ray extends LinearOpMode {
             double leftPower;
             double rightPower;
             double rightPowerArm;
+            boolean rackPinionPower;
 
             // Choose to drive using either Tank Mode, or POV Mode
             // Comment out the method that's not used.  The default below is POV.
@@ -100,6 +101,8 @@ public class BasicOpMode_Linear_Ray extends LinearOpMode {
             double turn  =  gamepad1.right_stick_x;
             double up = gamepad2.left_stick_y;
             double down = gamepad2.left_stick_y;
+            float raise = gamepad2.right_trigger;
+            boolean lower = gamepad2.right_bumper;
             //leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
             //rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
 
@@ -107,17 +110,19 @@ public class BasicOpMode_Linear_Ray extends LinearOpMode {
             // - This requires no math, but it is hard to drive forward slowly and keep straight.
             leftPower  = -gamepad1.left_stick_y ;
             rightPower = -gamepad1.right_stick_y ;
-            rightPowerArm = -gamepad2.left_stick_y;
             rightPowerArm = gamepad2.left_stick_y;
+            rackPinionPower = gamepad2.right_bumper;
+            //make new variable float
 
             // Send calculated power to wheels
             leftDrive.setPower(leftPower);
             rightDrive.setPower(rightPower);
             rightArm.setPower(rightPowerArm);
+            rackPinion.setPower(rackPinionPower);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Motors", "left (%.2f), right (%.2f), right (%2f)", leftPower, rightPower, rightPowerArm);
+            telemetry.addData("Motors", "left (%.2f), right (%.2f), right (%2f), rack (%2f)", leftPower, rightPower, rightPowerArm, rackPinionPower);
             telemetry.update();
         }
     }
